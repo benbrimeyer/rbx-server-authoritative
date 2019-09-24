@@ -26,6 +26,17 @@
       "$className": "ReplicatedStorage",
       "Source": {
         "$path": "src"
+      },
+      "Packages": {
+        "$className": "Folder",
+
+        "rodash": {
+          "$path": "rodash/src"
+        },
+
+        "import": {
+          "$path": "import/src"
+        }
       }
     },
     "SoundService": {
