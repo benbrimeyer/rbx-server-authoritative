@@ -1,7 +1,6 @@
 local configWrapper = require(script.Parent.configWrapper)
 local rodash = require(script.Parent.Parent.rodash)
 
-local Entity = require(script.Parent.Entity)
 local LagNetwork = require(script.Parent.LagNetwork)
 
 local renderWorld = require(script.Parent.renderWorld)
@@ -46,13 +45,10 @@ function Server:connect(client)
 	table.insert(self.clients, client);
 
 	-- Create a new Entity for this Client.
-	local entity = Entity.new();
-	table.insert(self.entities, entity)
-	entity.entity_id = client.entity_id;
+	table.insert(self.entities, client.entity_id)
 
 	-- Set the initial state of the Entity (e.g. spawn point)
-	local spawn_points = {4, 6};
-	entity.x = spawn_points[client.entity_id];
+	self.options.entityInit(client.entity_id)
 end
 
 function Server:setUpdateRate(hz)
@@ -113,13 +109,14 @@ function Server:sendWorldState()
 	local world_state = {};
 	local num_clients = #self.clients;
 	for i = 1, num_clients do
-		local entity = self.entities[i];
-		table.insert(world_state, {
-			entity_id = entity.entity_id,
-			position = entity.x,
-			last_processed_input = self.last_processed_input[i]
-		});
+		local entity_id = self.entities[i];
+
+		table.insert(world_state, rodash.combine(self.options.createWorldState(entity_id), {
+			entity_id = entity_id,
+			last_processed_input = self.last_processed_input[i],
+		}))
 	end
+
 
 	-- Broadcast the state to all the clients.
 	for i = 1, num_clients do
