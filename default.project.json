@@ -24,9 +24,7 @@
     },
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
-      "Source": {
-        "$path": "src"
-      },
+
       "Packages": {
         "$className": "Folder",
 
@@ -36,9 +34,22 @@
 
         "import": {
           "$path": "import/src"
+        },
+
+        "engine": {
+          "$path": "src"
         }
       }
     },
+
+    "ReplicatedFirst": {
+      "$className": "ReplicatedFirst",
+
+      "main": {
+        "$path": "main.client.lua"
+      }
+    },
+
     "SoundService": {
       "$className": "SoundService",
       "$properties": {
