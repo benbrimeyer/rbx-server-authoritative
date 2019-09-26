@@ -19,11 +19,10 @@ local transformComponent = recs.defineComponent({
 local renderSystem = function(core, canvas)
 	local render = recs.System:extend("render")
 	function render:init()
+		-- helper function to find first child
 		self.element = function(id, scope)
 			return (scope or game):FindFirstChild(id, true) or error("Could not find: " .. id);
 		end
-
-		self.server_canvas = game:FindFirstChild("server_canvas", true)
 	end
 	function render:step(dt)
 		local colors = {BrickColor.new("Bright blue").Color, BrickColor.new("Bright red").Color};
