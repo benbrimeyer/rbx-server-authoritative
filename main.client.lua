@@ -6,11 +6,11 @@ local engine = require(game.ReplicatedStorage.Packages.engine).config({
 	-- modify and create entities
 	inputMap = {
 		move_left = function(entity, input)
-			entity.x = entity.x + (input.press_time * entity.speed)
+			entity.x = entity.x + -(input.press_time * entity.speed)
 		end,
 
 		move_right = function(entity, input)
-			entity.x = entity.x + -(input.press_time * entity.speed)
+			entity.x = entity.x + (input.press_time * entity.speed)
 		end
 	},
 
@@ -18,10 +18,13 @@ local engine = require(game.ReplicatedStorage.Packages.engine).config({
 })
 
 local player1 = engine.client()
-player1:setUpdateRate(50)
 
 local server = engine.server()
 server:connect(player1);
+
+-- TODO: Remove
+player1.canvas = game:FindFirstChild("player1_canvas", true)
+server.canvas = game:FindFirstChild("server_canvas", true)
 
 -- We don't care or want to know how consumers process input,
 -- as long as they give us valid input's defined from the inputMap

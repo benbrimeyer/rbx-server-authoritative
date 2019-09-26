@@ -4,6 +4,8 @@ local rodash = require(script.Parent.Parent.rodash)
 local Entity = require(script.Parent.Entity)
 local LagNetwork = require(script.Parent.LagNetwork)
 
+local renderWorld = require(script.Parent.renderWorld)
+
 local Server = {}
 Server.__index = Server
 
@@ -27,6 +29,14 @@ function Server.new(options)
 	self:setUpdateRate(10);
 
 	return self
+end
+
+function Server:applyInputToEntity(input, entity)
+	local inputMap = self.options.inputMap
+	for _, state in ipairs(input.state) do
+		local bind = inputMap[state]
+		bind(entity, input)
+	end
 end
 
 function Server:connect(client)
@@ -63,8 +73,8 @@ function Server:update()
 	self:processInputs()
 	self:sendWorldState()
 
-	-- TODO
-	--renderWorld(self.canvas, self.entities)
+	-- TODO: Remove
+	renderWorld(self.canvas, self.entities)
 end
 
 -- Check whether this input seems to be valid (e.g. "make sense" according
@@ -93,14 +103,6 @@ function Server:processInputs()
 			self:applyInputToEntity(message, self.entities[id])
 			self.last_processed_input[id] = message.input_sequence_number;
 		end
-	end
-end
-
-function Server:applyInputToEntity(input, entity)
-	local inputMap = self.options.inputMap
-	for _, state in ipairs(input.state) do
-		local bind = inputMap[state]
-		bind(entity, input)
 	end
 end
 

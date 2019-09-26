@@ -4,13 +4,15 @@ local rodash = require(script.Parent.Parent.rodash)
 local Entity = require(script.Parent.Entity)
 local LagNetwork = require(script.Parent.LagNetwork)
 
+local renderWorld = require(script.Parent.renderWorld)
+
 local Client = {}
 Client.__index = Client
 
 function Client.new(options)
 	local networkImpl = options.networkImpl or LagNetwork
 
-	return setmetatable({
+	local self = setmetatable({
 		-- Local representation of the entities.
 		entities = {};
 
@@ -32,6 +34,10 @@ function Client.new(options)
 		options = options,
 
 	}, Client)
+
+	self:setUpdateRate(50)
+
+	return self
 end
 
 function Client:input(name, isDown)
@@ -84,12 +90,8 @@ function Client:update()
 	-- Interpolate other entities.
 	self:interpolateEntities();
 
-	-- TODO: Render the World.
-	-- renderWorld(self.canvas, self.entities);
-
-	for _, entity in ipairs(self.entities) do
-		print(entity.x)
-	end
+	-- TODO: Remove
+	renderWorld(self.canvas, self.entities);
 end
 
 -- Get inputs and send them to the server.
@@ -120,10 +122,8 @@ function Client:processInputs()
 	self.server.network:send(self.lag, input);
 
 	-- Do client-side prediction.
-	if (self.client_side_prediction) then
-		if self.entities[self.entity_id] then
-			self:applyInputToEntity(input, self.entities[self.entity_id])
-		end
+	if self.entities[self.entity_id] then
+		self:applyInputToEntity(input, self.entities[self.entity_id])
 	end
 
 	-- Save this input for later reconciliation.
