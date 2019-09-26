@@ -9,7 +9,7 @@ core:registerComponent(recs.defineComponent({
 		return {
 			x = 4,
 			position_buffer = {},
-			speed = 2000,
+			speed = 2,
 		}
 	end,
 }))
@@ -18,7 +18,15 @@ core:registerComponent(recs.defineComponent({
 local position_buffer = {}
 local engine = require(game.ReplicatedStorage.Packages.engine).config({
 	-- TODO: Remove server_update_rate
+	-- Currently this is needed by the client to determine interpolation
 	server_update_rate = 10,
+
+	-- (Server) Build snapshot of entity's worldState here.
+	createWorldState = function(entityId)
+		return {
+			x = core:getComponent(entityId, "transform").x,
+		}
+	end,
 
 	-- (Client/Server) Register inputs that modify and create entities
 	inputMap = {
@@ -36,13 +44,6 @@ local engine = require(game.ReplicatedStorage.Packages.engine).config({
 	-- (Client/Server) Initialize entities here.
 	entityInit = function(entityId)
 		core:addComponent(entityId, "transform")
-	end,
-
-	-- (Server) Build snapshot of entity's worldState here.
-	createWorldState = function(entityId)
-		return {
-			x = core:getComponent(entityId, "transform").x,
-		}
 	end,
 
 	-- (Client) Received the authoritative position of this client's entity.

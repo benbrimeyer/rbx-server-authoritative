@@ -99,7 +99,7 @@ function Client:processInputs()
 	-- Compute delta time since last update.
 	local now_ts = tick();
 	local last_ts = self.last_ts or now_ts;
-	local dt_sec = (now_ts - last_ts) / 1000.0;
+	local dt_sec = (now_ts - last_ts);
 	self.last_ts = now_ts;
 
 	-- Package player's input.
@@ -185,7 +185,7 @@ function Client:interpolateEntities()
 	local now = tick();
 	local render_timestamp = now - (1 / self.options.server_update_rate);
 
-	for _, entity_id in pairs(self.entities) do
+	for entity_id, _ in pairs(self.entities) do
 		-- No point in interpolating our own client's entity.
 		if (entity_id ~= self.entity_id) then
 			self.options.interp.invoke(entity_id, render_timestamp)
