@@ -4,3 +4,6 @@
 [submodule "import"]
 	path = import
 	url = https://github.com/vocksel/import.git
+[submodule "recs"]
+	path = recs
+	url = https://github.com/AmaranthineCodices/recs.git
