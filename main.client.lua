@@ -1,8 +1,6 @@
 game.ReplicatedFirst:RemoveDefaultLoadingScreen()
 game.ReplicatedStorage:WaitForChild("Packages")
 
-local rodash = require(game.ReplicatedStorage.Packages.rodash)
-
 local recs = require(game.ReplicatedStorage.Packages.recs)
 local core = recs.Core.new()
 core:registerComponent(recs.defineComponent({
@@ -19,8 +17,10 @@ core:registerComponent(recs.defineComponent({
 -- placeholder for interp
 local position_buffer = {}
 local engine = require(game.ReplicatedStorage.Packages.engine).config({
-	-- inputMap allows consumers to register inputs that
-	-- modify and create entities
+	-- TODO: Remove server_update_rate
+	server_update_rate = 10,
+
+	-- (Client/Server) Register inputs that modify and create entities
 	inputMap = {
 		move_left = function(entityId, input)
 			local transform = core:getComponent(entityId, "transform")
@@ -33,12 +33,12 @@ local engine = require(game.ReplicatedStorage.Packages.engine).config({
 		end
 	},
 
-	server_update_rate = 10,
-
+	-- (Client/Server) Initialize entities here.
 	entityInit = function(entityId)
 		core:addComponent(entityId, "transform")
 	end,
 
+	-- (Server) Build snapshot of entity's worldState here.
 	createWorldState = function(entityId)
 		return {
 			x = core:getComponent(entityId, "transform").x,
@@ -51,6 +51,7 @@ local engine = require(game.ReplicatedStorage.Packages.engine).config({
 	end,
 
 	-- (Client) Object that handles interpolation
+	-- TODO: Consider making this an object which can s.m.r.t interp whitelisted components
 	interp = {
 		addToBuffer = function(entityId, dataSet)
 			table.insert(position_buffer[entityId], dataSet)
