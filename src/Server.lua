@@ -111,12 +111,11 @@ function Server:sendWorldState()
 	for i = 1, num_clients do
 		local entity_id = self.entities[i];
 
-		table.insert(world_state, rodash.combine(self.options.createWorldState(entity_id), {
+		table.insert(world_state, rodash.merge(self.options.createWorldState(entity_id), {
 			entity_id = entity_id,
 			last_processed_input = self.last_processed_input[i],
 		}))
 	end
-
 
 	-- Broadcast the state to all the clients.
 	for i = 1, num_clients do

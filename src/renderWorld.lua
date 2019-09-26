@@ -5,7 +5,7 @@ local element = function(id, scope)
 end
 
 return function(canvas, entities)
-	local colors = {BrickColor.new("Bright blue").Color, BrickColor.new("Bright red").Color};
+	--[[local colors = {BrickColor.new("Bright blue").Color, BrickColor.new("Bright red").Color};
 
 	local canvasWidth = canvas.AbsoluteSize.X
 	local canvasHeight = canvas.AbsoluteSize.Y
@@ -22,5 +22,5 @@ return function(canvas, entities)
 		ball.Position = UDim2.new(0, x, 0.5, 0)
 		ball.Size = UDim2.new(0, radius, 0, radius)
 		ball.BackgroundColor3 = color
-	end
+	end]]
 end

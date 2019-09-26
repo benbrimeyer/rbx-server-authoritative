@@ -1,7 +1,6 @@
 local configWrapper = require(script.Parent.configWrapper)
 local rodash = require(script.Parent.Parent.rodash)
 
-local Entity = require(script.Parent.Entity)
 local LagNetwork = require(script.Parent.LagNetwork)
 
 local renderWorld = require(script.Parent.renderWorld)
@@ -122,9 +121,7 @@ function Client:processInputs()
 	self.server.network:send(self.lag, input);
 
 	-- Do client-side prediction.
-	if self.entities[self.entity_id] then
-		self:applyInputToEntity(input, self.entities[self.entity_id])
-	end
+	self:applyInputToEntity(input, self.entity_id)
 
 	-- Save this input for later reconciliation.
 	table.insert(self.pending_inputs, input);
@@ -143,16 +140,19 @@ function Client:processServerMessages()
 		for _, state in ipairs(message) do
 			-- If this is the first time we see this entity, create a local representation.
 			if (not self.entities[state.entity_id]) then
-				local entity = Entity.new();
+				--[[local entity = Entity.new();
 				entity.entity_id = state.entity_id;
-				self.entities[state.entity_id] = entity;
+				self.entities[state.entity_id] = entity;]]
+				self.options.entityInit(state.entity_id)
+				self.entities[state.entity_id] = true
 			end
 
-			local entity = self.entities[state.entity_id];
+			local entity_id = state.entity_id
 
 			if (state.entity_id == self.entity_id) then
 				-- Received the authoritative position of this client's entity.
-				entity.x = state.position;
+				--entity.x = state.position;
+				self.options.sync(entity_id, state)
 
 				-- Server Reconciliation. Re-apply all the inputs not yet processed by
 				-- the server.
@@ -165,7 +165,7 @@ function Client:processServerMessages()
 						table.remove(self.pending_inputs, j)
 					else
 						-- Not processed by the server yet. Re-apply it.
-						self:applyInputToEntity(input, entity)
+						self:applyInputToEntity(input, entity_id)
 						j = j + 1;
 					end
 				end
@@ -173,7 +173,8 @@ function Client:processServerMessages()
 				-- Received the position of an entity other than this client's.
 				-- Add it to the position buffer.
 				local timestamp = tick();
-				table.insert(entity.position_buffer, {timestamp, state.position});
+				self.options.interp.addToBuffer(entity_id, {timestamp = timestamp, state = state})
+				--table.insert(entity.position_buffer, {timestamp, state.position});
 			end
 		end
 	end
@@ -184,27 +185,10 @@ function Client:interpolateEntities()
 	local now = tick();
 	local render_timestamp = now - (1 / self.options.server_update_rate);
 
-	for _, entity in pairs(self.entities) do
-		-- No point in interpolating this client's entity.
-		if (entity.entity_id ~= self.entity_id) then
-			-- Find the two authoritative positions surrounding the rendering timestamp.
-			local buffer = entity.position_buffer;
-			-- Drop older positions.
-			while (#buffer >= 2 and buffer[2][1] <= render_timestamp) do
-				table.remove(buffer, 1)
-			end
-
-			-- Interpolate between the two surrounding authoritative positions.
-			if (#buffer >= 2 and buffer[1][1] <= render_timestamp and render_timestamp <= buffer[2][1]) then
-				local x0 = buffer[1][2];
-				local x1 = buffer[2][2];
-				local t0 = buffer[1][1];
-				local t1 = buffer[2][1];
-
-				-- TODO: This is interpolating a function from inputMap
-				-- Should we mark certain properties/entities as translate-able?
-				entity.x = x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0);
-			end
+	for _, entity_id in pairs(self.entities) do
+		-- No point in interpolating our own client's entity.
+		if (entity_id ~= self.entity_id) then
+			self.options.interp.invoke(entity_id, render_timestamp)
 		end
 	end
 end
