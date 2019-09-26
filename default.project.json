@@ -40,6 +40,10 @@
           "$path": "recs/src"
         },
 
+        "recsBridge": {
+          "$path": "recsBridge"
+        },
+
         "engine": {
           "$path": "src"
         }

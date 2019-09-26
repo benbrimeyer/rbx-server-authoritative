@@ -19,12 +19,10 @@ function Client.new(options)
 		inputState = {},
 
 		-- Simulated network connection.
-		network = networkImpl.new();
-		server = nil;
-		lag = 0;
+		network = networkImpl.new(options.address, options.lag);
 
 		-- Unique ID of our entity. Assigned by Server on connection.
-		entity_id = nil;
+		entity_id = options.address;
 
 		-- Data needed for reconciliation.
 		input_sequence_number = 0;
@@ -99,7 +97,7 @@ function Client:processInputs()
 	-- Compute delta time since last update.
 	local now_ts = tick();
 	local last_ts = self.last_ts or now_ts;
-	local dt_sec = (now_ts - last_ts);
+	local dt_sec = (now_ts - last_ts) / 1000;
 	self.last_ts = now_ts;
 
 	-- Package player's input.
@@ -118,7 +116,7 @@ function Client:processInputs()
 	self.input_sequence_number = self.input_sequence_number + 1
 	input.input_sequence_number = self.input_sequence_number;
 	input.entity_id = self.entity_id;
-	self.server.network:send(self.lag, input);
+	self.network:send("server", input);
 
 	-- Do client-side prediction.
 	self:applyInputToEntity(input, self.entity_id)

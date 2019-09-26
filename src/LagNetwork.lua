@@ -2,20 +2,36 @@
 --  A message queue with simulated network lag.
 -- =============================================================================
 
+-- TODO: Convert to use lua Signals
+local event = Instance.new("BindableEvent")
+
 local LagNetwork = {}
 LagNetwork.__index = LagNetwork
 
-function LagNetwork.new()
-	return setmetatable({
-		messages = {}
+function LagNetwork.new(address, lag)
+	local self = setmetatable({
+		lag = lag,
+		messages = {},
 	}, LagNetwork)
+
+	event.Event:Connect(function(incomingAddress, message)
+		if address ~= incomingAddress then
+			return
+		end
+
+		table.insert(self.messages, {
+			recv_ts = tick() + lag,
+			payload = message,
+		})
+	end)
+
+	return self
 end
 
-function LagNetwork:send(lag_ms, message)
-	table.insert(self.messages, {
-		recv_ts = tick() + lag_ms,
-		payload = message,
-	})
+function LagNetwork:send(address, message)
+	delay(self.lag, function()
+		event:Fire(address, message)
+	end)
 end
 
 function LagNetwork:receive()

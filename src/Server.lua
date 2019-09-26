@@ -20,7 +20,7 @@ function Server.new(options)
 		last_processed_input = {};
 
 		-- Simulated network connection.
-		network = networkImpl.new();
+		network = networkImpl.new(options.address, options.lag);
 
 		options = options,
 	}, Server)
@@ -38,17 +38,17 @@ function Server:applyInputToEntity(input, entity)
 	end
 end
 
-function Server:connect(client)
+function Server:connect(clientId)
 	-- Give the Client enough data to identify itself.
-	client.server = self;
-	client.entity_id = #self.clients + 1;
-	table.insert(self.clients, client);
+	--client.server = self;
+	--client.entity_id = #self.clients + 1;
+	table.insert(self.clients, clientId);
 
 	-- Create a new Entity for this Client.
-	table.insert(self.entities, client.entity_id)
+	table.insert(self.entities, clientId)
 
 	-- Set the initial state of the Entity (e.g. spawn point)
-	self.options.entityInit(client.entity_id)
+	self.options.entityInit(clientId)
 end
 
 function Server:setUpdateRate(hz)
@@ -119,8 +119,11 @@ function Server:sendWorldState()
 
 	-- Broadcast the state to all the clients.
 	for i = 1, num_clients do
-		local client = self.clients[i];
-		client.network:send(client.lag, world_state);
+		--local client = self.clients[i];
+		--client.network:send(client.lag, world_state);
+
+		local clientId = self.clients[i]
+		self.network:send(clientId, world_state)
 	end
 end
 
