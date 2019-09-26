@@ -41,11 +41,6 @@ return function(core)
 		-- TODO: Consider making this an object which can s.m.r.t interp whitelisted components
 		interp = {
 			addToBuffer = function(entityId, dataSet)
-				if not position_buffer[entityId] then
-					warn("position_buffer not made yet: " .. entityId)
-					return
-				end
-
 				table.insert(position_buffer[entityId], dataSet)
 			end,
 
