@@ -171,11 +171,16 @@ function Client:processServerMessages()
 				-- Received the position of an entity other than this client's.
 				-- Add it to the position buffer.
 				local timestamp = tick();
-				self.options.interp.addToBuffer(entity_id, {timestamp = timestamp, state = state})
+				table.insert(self.position_buffer[entity_id], {timestamp = timestamp, state = state})
 				--table.insert(entity.position_buffer, {timestamp, state.position});
 			end
 		end
 	end
+end
+
+local lerp = function(renderTime, x0, x1, t0, t1)
+	-- numbers
+	return x0 + (x1 - x0) * (renderTime - t0) / (t1 - t0)
 end
 
 function Client:interpolateEntities()
@@ -186,7 +191,29 @@ function Client:interpolateEntities()
 	for entity_id, _ in pairs(self.entities) do
 		-- No point in interpolating our own client's entity.
 		if (entity_id ~= self.entity_id) then
-			self.options.interp.invoke(entity_id, render_timestamp)
+
+			-- Find the two authoritative positions surrounding the rendering timestamp.
+			self.position_buffer[entity_id] = self.position_buffer[entity_id] or {}
+			local buffer = self.position_buffer[entity_id];
+			-- Drop older positions.
+			while (#buffer >= 2 and buffer[2].timestamp <= render_timestamp) do
+				table.remove(buffer, 1)
+			end
+
+			-- Interpolate between the two surrounding authoritative positions.
+			if (#buffer >= 2 and buffer[1].timestamp <= render_timestamp and render_timestamp <= buffer[2].timestamp) then
+				local state0 = buffer[1].state;
+				local state1 = buffer[2].state;
+				local t0 = buffer[1].timestamp;
+				local t1 = buffer[2].timestamp;
+
+				local lerpedState = {}
+				for property, value in pairs(state0) do
+					lerpedState[property] = lerp(render_timestamp, value, state1[property], t0, t1)
+				end
+
+				self.options.entityWrite(entity_id, lerpedState)
+			end
 		end
 	end
 end

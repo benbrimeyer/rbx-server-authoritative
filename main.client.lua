@@ -10,6 +10,7 @@ local transformComponent = recs.defineComponent({
 	generator = function()
 		return {
 			x = 4,
+			y = 0,
 			position_buffer = {},
 			speed = 2000,
 		}
@@ -34,12 +35,13 @@ local renderSystem = function(core, canvas)
 			-- Compute size and position.
 			local radius = canvasHeight*0.9/2;
 			local x = (transform.x / 10.0)*canvasWidth;
+			local y = (transform.y / 2.0)*canvasHeight;
 			local color = colors[entityId]
 
 			-- Draw the entity.
 			local ball = self.element("ball" .. entityId, canvas)
 			ball.AnchorPoint = Vector2.new(0, 0.5)
-			ball.Position = UDim2.new(0, x, 0.5, 0)
+			ball.Position = UDim2.new(0, x, 0.5, y)
 			ball.Size = UDim2.new(0, radius, 0, radius)
 			ball.BackgroundColor3 = color
 		end
@@ -69,6 +71,10 @@ do -- player1
 			player1:input("move_right", isKeyDown)
 		elseif inputObject.KeyCode == Enum.KeyCode.A then
 			player1:input("move_left", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.W then
+			player1:input("move_up", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.S then
+			player1:input("move_down", isKeyDown)
 		end
 	end, false, Enum.UserInputType.Keyboard)
 end
