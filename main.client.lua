@@ -12,7 +12,7 @@ local transformComponent = recs.defineComponent({
 			x = 4,
 			y = 0,
 			position_buffer = {},
-			speed = 2000,
+			speed = 16,
 		}
 	end,
 })
@@ -24,26 +24,13 @@ local renderSystem = function(core, canvas)
 		self.element = function(id, scope)
 			return (scope or game):FindFirstChild(id, true) or error("Could not find: " .. id);
 		end
+
+		self.lastPos = Vector3.new()
 	end
-	function render:step(dt)
-		local colors = {BrickColor.new("Bright blue").Color, BrickColor.new("Bright red").Color};
-
-		local canvasWidth = canvas.AbsoluteSize.X
-		local canvasHeight = canvas.AbsoluteSize.Y
-
+	function render:step()
 		for entityId, transform in core:components("transform") do
-			-- Compute size and position.
-			local radius = canvasHeight*0.9/2;
-			local x = (transform.x / 10.0)*canvasWidth;
-			local y = (transform.y / 2.0)*canvasHeight;
-			local color = colors[entityId]
-
-			-- Draw the entity.
-			local ball = self.element("ball" .. entityId, canvas)
-			ball.AnchorPoint = Vector2.new(0, 0.5)
-			ball.Position = UDim2.new(0, x, 0.5, y)
-			ball.Size = UDim2.new(0, radius, 0, radius)
-			ball.BackgroundColor3 = color
+			local player = self.element("partplayer" .. entityId, canvas)
+			player.Position = player.Position:lerp(Vector3.new(transform.x, 4.25, transform.y), 0.1)
 		end
 	end
 
@@ -59,7 +46,13 @@ do -- player1
 
 	local render = renderSystem(core, game:FindFirstChild("player1_canvas", true))
 	core:registerSystem(render)
-	core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+	--core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+
+	render:init()
+	game:GetService("RunService"):BindToRenderStep("temp", Enum.RenderPriority.Camera.Value - 1, function(dt)
+		render:step(dt)
+	end)
+
 
 	core:start()
 
@@ -90,7 +83,7 @@ do -- server
 
 	local render = renderSystem(core, game:FindFirstChild("server_canvas", true))
 	core:registerSystem(render)
-	core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+	--core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
 
 	core:start()
 

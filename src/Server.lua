@@ -76,7 +76,8 @@ end
 -- Check whether this input seems to be valid (e.g. "make sense" according
 -- to the physical rules of the World)
 function Server:validateInput(input)
-	if (math.abs(input.press_time) > 1/40) then
+	if (math.abs(input.press_time) > 1/20) then
+		print(math.abs(input.press_time) - 1/20)
 		return false;
 	else
 		return true;

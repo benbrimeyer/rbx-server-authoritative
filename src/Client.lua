@@ -32,7 +32,7 @@ function Client.new(options)
 
 	}, Client)
 
-	self:setUpdateRate(50)
+	self:setUpdateRate(60)
 
 	return self
 end
@@ -97,7 +97,7 @@ function Client:processInputs()
 	-- Compute delta time since last update.
 	local now_ts = tick();
 	local last_ts = self.last_ts or now_ts;
-	local dt_sec = (now_ts - last_ts) / 1000;
+	local dt_sec = (now_ts - last_ts);
 	self.last_ts = now_ts;
 
 	-- Package player's input.
