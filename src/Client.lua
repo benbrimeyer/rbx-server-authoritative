@@ -51,9 +51,9 @@ function Client:input(name, isDown)
 end
 
 function Client:applyInputToEntity(input, entity)
-	local inputMap = self.options.inputMap
+	local entityInput  = self.options.entityInput
 	for _, state in ipairs(input.state) do
-		local bind = inputMap[state]
+		local bind = entityInput [state]
 		bind(entity, input)
 	end
 end
@@ -150,7 +150,7 @@ function Client:processServerMessages()
 			if (state.entity_id == self.entity_id) then
 				-- Received the authoritative position of this client's entity.
 				--entity.x = state.position;
-				self.options.sync(entity_id, state)
+				self.options.entityWrite(entity_id, state)
 
 				-- Server Reconciliation. Re-apply all the inputs not yet processed by
 				-- the server.

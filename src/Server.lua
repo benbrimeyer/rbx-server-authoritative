@@ -31,9 +31,9 @@ function Server.new(options)
 end
 
 function Server:applyInputToEntity(input, entity)
-	local inputMap = self.options.inputMap
+	local entityInput  = self.options.entityInput
 	for _, state in ipairs(input.state) do
-		local bind = inputMap[state]
+		local bind = entityInput [state]
 		bind(entity, input)
 	end
 end
@@ -111,7 +111,7 @@ function Server:sendWorldState()
 	for i = 1, num_clients do
 		local entity_id = self.entities[i];
 
-		table.insert(world_state, rodash.merge(self.options.createWorldState(entity_id), {
+		table.insert(world_state, rodash.merge(self.options.entityRead(entity_id), {
 			entity_id = entity_id,
 			last_processed_input = self.last_processed_input[i],
 		}))

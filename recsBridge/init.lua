@@ -8,14 +8,14 @@ return function(core)
 		server_update_rate = 10,
 
 		-- (Server) Build snapshot of entity's worldState here.
-		createWorldState = function(entityId)
+		entityRead = function(entityId)
 			return {
 				x = core:getComponent(entityId, "transform").x,
 			}
 		end,
 
 		-- (Client/Server) Register inputs that modify and create entities
-		inputMap = {
+		entityInput = {
 			move_left = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
 				transform.x = transform.x + -(input.press_time * transform.speed)
@@ -33,7 +33,7 @@ return function(core)
 		end,
 
 		-- (Client) Received the authoritative position of this client's entity.
-		sync = function(entityId, state)
+		entityWrite = function(entityId, state)
 			core:getComponent(entityId, "transform").x = state.x
 		end,
 
