@@ -17,20 +17,24 @@ local transformComponent = recs.defineComponent({
 	end,
 })
 
-local renderSystem = function(core, canvas)
+local renderSystem = function(core, canvas, isLerped)
 	local render = recs.System:extend("render")
 	function render:init()
 		-- helper function to find first child
 		self.element = function(id, scope)
 			return (scope or game):FindFirstChild(id, true) or error("Could not find: " .. id);
 		end
-
-		self.lastPos = Vector3.new()
 	end
 	function render:step()
 		for entityId, transform in core:components("transform") do
-			local player = self.element("partplayer" .. entityId, canvas)
-			player.Position = player.Position:lerp(Vector3.new(transform.x, 4.25, transform.y), 0.1)
+			local player = self.element("Part" .. entityId, canvas)
+			local newPosition = Vector3.new(transform.x, 4.25, transform.y)
+
+			if isLerped then
+				player.Position = player.Position:lerp(newPosition, 0.1)
+			else
+				player.Position = newPosition
+			end
 		end
 	end
 
@@ -44,7 +48,7 @@ do -- player1
 	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 0 }))
 	local player1 = engine.client()
 
-	local render = renderSystem(core, game:FindFirstChild("player1_canvas", true))
+	local render = renderSystem(core, game:FindFirstChild("player1", true))
 	core:registerSystem(render)
 	--core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
 
@@ -81,9 +85,9 @@ do -- server
 
 	server:connect(1)
 
-	local render = renderSystem(core, game:FindFirstChild("server_canvas", true))
+	local render = renderSystem(core, game:FindFirstChild("server", true))
 	core:registerSystem(render)
-	--core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+	core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
 
 	core:start()
 
