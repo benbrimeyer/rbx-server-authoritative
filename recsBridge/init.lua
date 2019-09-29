@@ -1,10 +1,6 @@
 return function(core)
-	local function toWorldSpace(transform, direction)
-		local angle = CFrame.Angles(0, math.rad(transform.yaw or 0), 0)
-
-		return angle:VectorToWorldSpace(direction)
-	end
-
+	local whiteListComponents = require(script.whiteListComponents)(core)
+	local whitelist = whiteListComponents("transform", "motion", "walk")
 
 	return {
 		-- TODO: Remove server_update_rate
@@ -12,32 +8,24 @@ return function(core)
 		server_update_rate = 10,
 
 		-- (Client/Server) Initialize entities here.
-		entityInit = function(entityId)
-			core:addComponent(entityId, "transform")
-		end,
+		entityInit = whitelist.init,
 
 		-- (Client/Server) Build snapshot of entity's worldState here.
-		entityRead = function(entityId)
-			return {
-				position = core:getComponent(entityId, "transform").position,
-				pitch = core:getComponent(entityId, "transform").pitch,
-				yaw = core:getComponent(entityId, "transform").yaw,
-			}
-		end,
+		entityRead = whitelist.read,
 
 		-- (Client) Received the authoritative position of this client's entity.
-		entityWrite = function(entityId, state)
+		--[[entityWrite = function(entityId, state)
 			core:getComponent(entityId, "transform").position = state.position
 			core:getComponent(entityId, "transform").pitch = state.pitch
 			core:getComponent(entityId, "transform").yaw = state.yaw
-		end,
+		end,]]
+		entityWrite = whitelist.write,
 
 		-- (Client/Server) Register inputs that modify and create entities
 		entityInput = {
 			move_left = function(entityId, input)
-				local transform = core:getComponent(entityId, "transform")
-				local normalizedDirection = Vector3.new(-(input.press_time * transform.speed), 0, 0)
-				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
+				local walk = core:getComponent(entityId, "walk")
+				walk.moveDirection = walk.moveDirection + Vector3.new(-(input.press_time), 0, 0)
 			end,
 
 			move_right = function(entityId, input)

@@ -54,7 +54,7 @@
       "$className": "ReplicatedFirst",
 
       "main": {
-        "$path": "main.client.lua"
+        "$path": "example"
       }
     },
 
