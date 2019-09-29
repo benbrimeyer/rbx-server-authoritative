@@ -45,7 +45,7 @@ do -- player1
 	local core = recs.Core.new()
 	core:registerComponent(transformComponent)
 
-	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 0 }))
+	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 100/1000 }))
 	local player1 = engine.client()
 
 	local render = renderSystem(core, game:FindFirstChild("player1", true), true)

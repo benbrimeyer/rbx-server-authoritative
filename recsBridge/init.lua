@@ -1,4 +1,11 @@
 return function(core)
+	local function toWorldSpace(transform, direction)
+		local angle = CFrame.Angles(0, math.rad(transform.yaw or 0), 0)
+
+		return angle:VectorToWorldSpace(direction)
+	end
+
+
 	return {
 		-- TODO: Remove server_update_rate
 		-- Currently this is needed by the client to determine interpolation
@@ -29,22 +36,26 @@ return function(core)
 		entityInput = {
 			move_left = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.position = transform.position + Vector3.new(-(input.press_time * transform.speed), 0, 0)
+				local normalizedDirection = Vector3.new(-(input.press_time * transform.speed), 0, 0)
+				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
 			end,
 
 			move_right = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.position = transform.position + Vector3.new((input.press_time * transform.speed), 0, 0)
+				local normalizedDirection = Vector3.new((input.press_time * transform.speed), 0, 0)
+				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
 			end,
 
 			move_up = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.position = transform.position + Vector3.new(0, 0, -(input.press_time * transform.speed))
+				local normalizedDirection = Vector3.new(0, 0, -(input.press_time * transform.speed))
+				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
 			end,
 
 			move_down = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.position = transform.position + Vector3.new(0, 0, (input.press_time * transform.speed))
+				local normalizedDirection = Vector3.new(0, 0, (input.press_time * transform.speed))
+				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
 			end,
 
 			look = function(entityId, input)
