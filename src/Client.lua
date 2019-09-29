@@ -14,6 +14,7 @@ function Client.new(options)
 	local self = setmetatable({
 		-- Local representation of the entities.
 		entities = {};
+		position_buffer = {},
 
 		-- Input state.
 		inputState = {},
@@ -142,6 +143,7 @@ function Client:processServerMessages()
 				entity.entity_id = state.entity_id;
 				self.entities[state.entity_id] = entity;]]
 				self.options.entityInit(state.entity_id)
+				self.position_buffer[state.entity_id] = {}
 				self.entities[state.entity_id] = true
 			end
 
@@ -179,7 +181,7 @@ function Client:processServerMessages()
 end
 
 local lerp = function(renderTime, x0, x1, t0, t1)
-	-- numbers
+	-- numbers/vector2/vector3
 	return x0 + (x1 - x0) * (renderTime - t0) / (t1 - t0)
 end
 
@@ -209,7 +211,9 @@ function Client:interpolateEntities()
 
 				local lerpedState = {}
 				for property, value in pairs(state0) do
-					lerpedState[property] = lerp(render_timestamp, value, state1[property], t0, t1)
+					if property ~= "entity_id" and property ~= "last_processed_input" then
+						lerpedState[property] = lerp(render_timestamp, value, state1[property], t0, t1)
+					end
 				end
 
 				self.options.entityWrite(entity_id, lerpedState)

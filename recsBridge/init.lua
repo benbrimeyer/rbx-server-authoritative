@@ -12,37 +12,35 @@ return function(core)
 		-- (Client/Server) Build snapshot of entity's worldState here.
 		entityRead = function(entityId)
 			return {
-				x = core:getComponent(entityId, "transform").x,
-				y = core:getComponent(entityId, "transform").y,
+				position = core:getComponent(entityId, "transform").position,
 			}
 		end,
 
 		-- (Client) Received the authoritative position of this client's entity.
 		entityWrite = function(entityId, state)
-			core:getComponent(entityId, "transform").x = state.x
-			core:getComponent(entityId, "transform").y = state.y
+			core:getComponent(entityId, "transform").position = state.position
 		end,
 
 		-- (Client/Server) Register inputs that modify and create entities
 		entityInput = {
 			move_left = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.x = transform.x + -(input.press_time * transform.speed)
+				transform.position = transform.position + Vector3.new(-(input.press_time * transform.speed), 0, 0)
 			end,
 
 			move_right = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.x = transform.x + (input.press_time * transform.speed)
+				transform.position = transform.position + Vector3.new((input.press_time * transform.speed), 0, 0)
 			end,
 
 			move_up = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.y = transform.y + -(input.press_time * transform.speed)
+				transform.position = transform.position + Vector3.new(0, 0, -(input.press_time * transform.speed))
 			end,
 
 			move_down = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
-				transform.y = transform.y + (input.press_time * transform.speed)
+				transform.position = transform.position + Vector3.new(0, 0, (input.press_time * transform.speed))
 			end,
 		},
 	}

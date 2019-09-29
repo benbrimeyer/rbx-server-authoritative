@@ -9,9 +9,7 @@ local transformComponent = recs.defineComponent({
 	name = "transform",
 	generator = function()
 		return {
-			x = 4,
-			y = 0,
-			position_buffer = {},
+			position = Vector3.new(0, 4.25, 0),
 			speed = 16,
 		}
 	end,
@@ -28,7 +26,7 @@ local renderSystem = function(core, canvas, isLerped)
 	function render:step()
 		for entityId, transform in core:components("transform") do
 			local player = self.element("Part" .. entityId, canvas)
-			local newPosition = Vector3.new(transform.x, 4.25, transform.y)
+			local newPosition = transform.position
 
 			if isLerped then
 				player.Position = player.Position:lerp(newPosition, 0.1)
@@ -62,7 +60,7 @@ do -- player1
 
 	-- We don't care or want to know how consumers process input,
 	-- as long as they give us valid input's defined from the inputMap
-	game:GetService("ContextActionService"):BindAction("keyboard", function(_, _, inputObject)
+	game:GetService("ContextActionService"):BindAction("keyboard_player1", function(_, _, inputObject)
 		local isKeyDown = (inputObject.UserInputState == Enum.UserInputState.Begin)
 		if inputObject.KeyCode == Enum.KeyCode.D then
 			player1:input("move_right", isKeyDown)
@@ -72,6 +70,45 @@ do -- player1
 			player1:input("move_up", isKeyDown)
 		elseif inputObject.KeyCode == Enum.KeyCode.S then
 			player1:input("move_down", isKeyDown)
+		else
+			return Enum.ContextActionResult.Pass
+		end
+	end, false, Enum.UserInputType.Keyboard)
+end
+
+do -- player2
+	local core = recs.Core.new()
+	core:registerComponent(transformComponent)
+
+	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 2, lag = 100/1000 }))
+	local player2 = engine.client()
+
+	local render = renderSystem(core, game:FindFirstChild("player2", true))
+	core:registerSystem(render)
+	--core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+
+	render:init()
+	game:GetService("RunService"):BindToRenderStep("temp", Enum.RenderPriority.Camera.Value - 1, function(dt)
+		render:step(dt)
+	end)
+
+
+	core:start()
+
+	-- We don't care or want to know how consumers process input,
+	-- as long as they give us valid input's defined from the inputMap
+	game:GetService("ContextActionService"):BindAction("keyboard_player2", function(_, _, inputObject)
+		local isKeyDown = (inputObject.UserInputState == Enum.UserInputState.Begin)
+		if inputObject.KeyCode == Enum.KeyCode.K then
+			player2:input("move_right", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.H then
+			player2:input("move_left", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.U then
+			player2:input("move_up", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.J then
+			player2:input("move_down", isKeyDown)
+		else
+			return Enum.ContextActionResult.Pass
 		end
 	end, false, Enum.UserInputType.Keyboard)
 end
@@ -84,6 +121,7 @@ do -- server
 	local server = engine.server()
 
 	server:connect(1)
+	server:connect(2)
 
 	local render = renderSystem(core, game:FindFirstChild("server", true))
 	core:registerSystem(render)
