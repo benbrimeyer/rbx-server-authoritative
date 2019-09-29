@@ -29,6 +29,8 @@ function Client.new(options)
 
 		options = options,
 
+		updated = Instance.new("BindableEvent"),
+
 	}, Client)
 
 	self:setUpdateRate(60)
@@ -58,6 +60,7 @@ function Client:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput [state]
 		bind(entity, input)
+		self.updated:Fire(input, 1/self.update_rate)
 	end
 end
 

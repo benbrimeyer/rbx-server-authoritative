@@ -6,7 +6,7 @@ local recs = require(game.ReplicatedStorage.Packages.recs)
 local recsBridge = require(game.ReplicatedStorage.Packages.recsBridge)
 
 local renderSystem = require(script.Recs.Systems.render)
-
+local colliderSystem = require(script.Recs.Systems.collider)
 
 do -- player1
 	local core = recs.Core.new()
@@ -16,13 +16,17 @@ do -- player1
 	local player1 = engine.client()
 
 	local render = renderSystem(core, game:FindFirstChild("player1", true), true)
+	local collider = colliderSystem(core, 'player1')
 	core:registerSystem(render)
-	--core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+	core:registerSystem(collider)
+
+	core:registerStepper(recs.event(player1.updated.Event, { collider }))
+
 
 	render:init()
 	local lastPitch = 0
 	local lastYaw = 0
-	local CAMERA_THRESHOLD = 0.1
+	local CAMERA_THRESHOLD = 0.0
 	game:GetService("RunService"):BindToRenderStep("temp", Enum.RenderPriority.Camera.Value - 1, function(dt)
 		local x, y = workspace.CurrentCamera.CFrame:ToOrientation()
 		local pitch, yaw = math.deg(x), math.deg(y)
@@ -67,11 +71,14 @@ do -- server
 	local server = engine.server()
 
 	server:connect(1)
-	server:connect(2)
+	--server:connect(2)
 
 	local render = renderSystem(core, game:FindFirstChild("server", true))
+	local collider = colliderSystem(core, 'server')
 	core:registerSystem(render)
-	core:registerStepper(recs.event(game:GetService("RunService").RenderStepped, { render }))
+	core:registerSystem(collider)
+
+	core:registerStepper(recs.event(server.updated.Event, { collider, render }))
 
 	core:start()
 end

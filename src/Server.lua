@@ -21,9 +21,11 @@ function Server.new(options)
 		network = networkImpl.new(options.address, options.lag);
 
 		options = options,
+
+		updated = Instance.new("BindableEvent"),
 	}, Server)
 
-	self:setUpdateRate(10);
+	self:setUpdateRate(1);
 
 	return self
 end
@@ -33,6 +35,7 @@ function Server:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput[state]
 		bind(entity, input)
+		self.updated:Fire(input, 1/self.update_rate)
 	end
 end
 
@@ -71,8 +74,7 @@ end
 -- Check whether this input seems to be valid (e.g. "make sense" according
 -- to the physical rules of the World)
 function Server:validateInput(input)
-	if (math.abs(input.press_time) > 1/20) then
-		print(math.abs(input.press_time) - 1/20)
+	if (math.abs(input.press_time) > 1/10) then
 		return false;
 	else
 		return true;
