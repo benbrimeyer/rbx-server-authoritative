@@ -49,8 +49,12 @@ function Client:input(name, isDown)
 	end
 end
 
+function Client:look(pitch, yaw)
+	self._look = { pitch = pitch, yaw = yaw }
+end
+
 function Client:applyInputToEntity(input, entity)
-	local entityInput  = self.options.entityInput
+	local entityInput = self.options.entityInput
 	for _, state in ipairs(input.state) do
 		local bind = entityInput [state]
 		bind(entity, input)
@@ -100,6 +104,7 @@ function Client:processInputs()
 	local input;
 	if (#self.inputState > 0) then
 		input = {
+			look = self._look,
 			state = self.inputState,
 			press_time = dt_sec,
 		};

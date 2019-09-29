@@ -29,9 +29,9 @@ function Server.new(options)
 end
 
 function Server:applyInputToEntity(input, entity)
-	local entityInput  = self.options.entityInput
+	local entityInput = self.options.entityInput
 	for _, state in ipairs(input.state) do
-		local bind = entityInput [state]
+		local bind = entityInput[state]
 		bind(entity, input)
 	end
 end
