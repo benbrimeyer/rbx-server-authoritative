@@ -1,3 +1,5 @@
+local rodash = require(game.ReplicatedStorage.Packages.rodash)
+
 return function(core)
 	return function(...)
 		local args = { ... }
@@ -10,7 +12,7 @@ return function(core)
 			for property, _ in pairs(default) do
 				table.insert(array, property)
 			end
-			map[component] = array
+			map[name] = array
 		end
 
 		return {
@@ -21,7 +23,9 @@ return function(core)
 			read = function(entityId)
 				local readValues = {}
 				for component, propertyList in pairs(map) do
-					readValues[propertyList] = core:getComponent(entityId, component)[propertyList]
+					for _, propertyName in ipairs(propertyList) do
+						readValues[propertyName] = core:getComponent(entityId, component)[propertyName]
+					end
 				end
 
 				return readValues
@@ -29,7 +33,9 @@ return function(core)
 
 			write = function(entityId, state)
 				for component, propertyList in pairs(map) do
-					core:getComponent(entityId, component)[propertyList] = state[propertyList]
+					for _, propertyName in ipairs(propertyList) do
+						core:getComponent(entityId, component)[propertyName] = state[propertyName]
+					end
 				end
 			end,
 		}

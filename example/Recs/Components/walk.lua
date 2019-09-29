@@ -5,10 +5,8 @@ return recs.defineComponent({
 	generator = function()
 		return {
 			speed = 50,
-			direction = Vector3.new(0, 0, 0),
-			offset = Vector3.new(0, 0, 0),
-			x = 0,
-			y = 0,
+			moveX = 0,
+			moveY = 0,
 		}
 	end,
 })
