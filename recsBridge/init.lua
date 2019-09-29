@@ -14,11 +14,6 @@ return function(core)
 		entityRead = whitelist.read,
 
 		-- (Client) Received the authoritative position of this client's entity.
-		--[[entityWrite = function(entityId, state)
-			core:getComponent(entityId, "transform").position = state.position
-			core:getComponent(entityId, "transform").pitch = state.pitch
-			core:getComponent(entityId, "transform").yaw = state.yaw
-		end,]]
 		entityWrite = whitelist.write,
 
 		-- (Client/Server) Register inputs that modify and create entities
@@ -29,21 +24,18 @@ return function(core)
 			end,
 
 			move_right = function(entityId, input)
-				local transform = core:getComponent(entityId, "transform")
-				local normalizedDirection = Vector3.new((input.press_time * transform.speed), 0, 0)
-				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
+				local walk = core:getComponent(entityId, "walk")
+				walk.moveDirection = walk.moveDirection + Vector3.new((input.press_time), 0, 0)
 			end,
 
 			move_up = function(entityId, input)
-				local transform = core:getComponent(entityId, "transform")
-				local normalizedDirection = Vector3.new(0, 0, -(input.press_time * transform.speed))
-				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
+				local walk = core:getComponent(entityId, "walk")
+				walk.moveDirection = walk.moveDirection + Vector3.new(0, 0, -(input.press_time))
 			end,
 
 			move_down = function(entityId, input)
-				local transform = core:getComponent(entityId, "transform")
-				local normalizedDirection = Vector3.new(0, 0, (input.press_time * transform.speed))
-				transform.position = transform.position + toWorldSpace(transform, normalizedDirection)
+				local walk = core:getComponent(entityId, "walk")
+				walk.moveDirection = walk.moveDirection + Vector3.new(0, 0, (input.press_time))
 			end,
 
 			look = function(entityId, input)
