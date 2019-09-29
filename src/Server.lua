@@ -22,7 +22,8 @@ function Server.new(options)
 
 		options = options,
 
-		updated = Instance.new("BindableEvent"),
+		onInput = Instance.new("BindableEvent"),
+		onUpdate = Instance.new("BindableEvent"),
 	}, Server)
 
 	self:setUpdateRate(1);
@@ -35,7 +36,7 @@ function Server:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput[state]
 		bind(entity, input)
-		self.updated:Fire(input, 1/self.update_rate)
+		self.onInput:Fire(input, 1/self.update_rate)
 	end
 end
 
@@ -61,6 +62,7 @@ function Server:setUpdateRate(hz)
 	self.update_interval = rodash.setInterval(
 		function()
 			self:update()
+			self.onUpdate:Fire()
 		end,
 		1 / self.update_rate
 	);

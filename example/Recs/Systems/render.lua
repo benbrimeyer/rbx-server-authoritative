@@ -1,6 +1,6 @@
 local recs = require(game.ReplicatedStorage.Packages.recs)
 
-return function(core, canvas, isLerped)
+return function(core, canvas, isLerped, logger)
 	local render = recs.System:extend("render")
 	function render:init()
 		-- helper function to find first child

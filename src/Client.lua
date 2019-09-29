@@ -29,7 +29,8 @@ function Client.new(options)
 
 		options = options,
 
-		updated = Instance.new("BindableEvent"),
+		onInput = Instance.new("BindableEvent"),
+		onUpdate = Instance.new("BindableEvent"),
 
 	}, Client)
 
@@ -60,7 +61,7 @@ function Client:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput [state]
 		bind(entity, input)
-		self.updated:Fire(input, 1/self.update_rate)
+		self.onInput:Fire(input, 1/self.update_rate)
 	end
 end
 
@@ -73,6 +74,7 @@ function Client:setUpdateRate(hz)
 	self.update_interval = rodash.setInterval(
 		function()
 			self:update()
+			self.onUpdate:Fire()
 		end,
 		1 / self.update_rate
 	);
