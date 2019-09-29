@@ -3,8 +3,6 @@ local rodash = require(script.Parent.Parent.rodash)
 
 local LagNetwork = require(script.Parent.LagNetwork)
 
-local renderWorld = require(script.Parent.renderWorld)
-
 local Client = {}
 Client.__index = Client
 
@@ -87,9 +85,6 @@ function Client:update()
 
 	-- Interpolate other entities.
 	self:interpolateEntities();
-
-	-- TODO: Remove
-	renderWorld(self.canvas, self.entities);
 end
 
 -- Get inputs and send them to the server.

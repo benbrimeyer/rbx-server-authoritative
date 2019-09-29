@@ -3,8 +3,6 @@ local rodash = require(script.Parent.Parent.rodash)
 
 local LagNetwork = require(script.Parent.LagNetwork)
 
-local renderWorld = require(script.Parent.renderWorld)
-
 local Server = {}
 Server.__index = Server
 
@@ -68,9 +66,6 @@ end
 function Server:update()
 	self:processInputs()
 	self:sendWorldState()
-
-	-- TODO: Remove
-	renderWorld(self.canvas, self.entities)
 end
 
 -- Check whether this input seems to be valid (e.g. "make sense" according
