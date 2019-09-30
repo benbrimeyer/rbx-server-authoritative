@@ -5,7 +5,8 @@ return function(core, logger)
 
 	function collider:step()
 		for entityId, transform, motion in core:components("transform", "motion") do
-			print(logger, "collider:", entityId)
+			transform.position = transform.position + motion.velocity
+			motion.velocity = Vector3.new()
 		end
 	end
 

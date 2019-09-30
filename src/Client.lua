@@ -61,7 +61,7 @@ function Client:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput [state]
 		bind(entity, input)
-		self.onInput:Fire(input, 1/self.update_rate)
+		self.onInput:Fire(1/self.update_rate, input)
 	end
 end
 
@@ -71,10 +71,13 @@ function Client:setUpdateRate(hz)
 	if self.update_interval then
 		self.update_interval:clear()
 	end
+	local lastTick = tick()
 	self.update_interval = rodash.setInterval(
 		function()
+			local now = tick()
 			self:update()
-			self.onUpdate:Fire()
+			self.onUpdate:Fire(now - lastTick)
+			lastTick = now
 		end,
 		1 / self.update_rate
 	);

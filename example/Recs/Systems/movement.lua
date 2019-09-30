@@ -19,10 +19,10 @@ return function(core, logger)
 			local moveX = walk.moveX * walk.speed
 			local moveY = walk.moveY * walk.speed
 
-			--local move = Vector3.new(moveX, 0, moveY)
-			local move = clampMagnitude(Vector3.new(moveX, 0, moveY), walk.speed)
+			local move = Vector3.new(moveX, 0, moveY)
+			local clampedMove = clampMagnitude(move, walk.speed)
 
-			local direction = toWorldSpace(transform, move)
+			local direction = toWorldSpace(transform, clampedMove)
 			motion.velocity = motion.velocity + direction
 
 			walk.moveX = 0
