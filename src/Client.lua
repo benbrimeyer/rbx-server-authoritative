@@ -1,3 +1,4 @@
+local fixedStepped = require(script.Parent.fixedStepped)
 local configWrapper = require(script.Parent.configWrapper)
 local rodash = require(script.Parent.Parent.rodash)
 
@@ -68,19 +69,16 @@ end
 function Client:setUpdateRate(hz)
 	self.update_rate = hz
 
-	if self.update_interval then
-		self.update_interval:clear()
-	end
-	local lastTick = tick()
-	self.update_interval = rodash.setInterval(
-		function()
-			local now = tick()
-			self:update()
-			self.onUpdate:Fire(now - lastTick)
-			lastTick = now
-		end,
-		1 / self.update_rate
-	);
+	local stepper = fixedStepped.config({
+		signal = game:GetService("RunService").Heartbeat,
+		timeStep = 1 / hz,
+	})
+
+	self.connection = stepper.connect(function(dt)
+		self:update()
+		self.onUpdate:Fire(dt)
+	end)
+	stepper.start()
 end
 
 -- Update Client state.
