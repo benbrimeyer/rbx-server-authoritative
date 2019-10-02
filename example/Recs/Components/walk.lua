@@ -4,7 +4,8 @@ return recs.defineComponent({
 	name = "walk",
 	generator = function()
 		return {
-			speed = 1,
+			speed = 16,
+			direction = Vector3.new(),
 			moveX = 0,
 			moveY = 0,
 		}

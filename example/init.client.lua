@@ -23,8 +23,8 @@ do -- player1
 	core:registerSystem(movement)
 	core:registerSystem(collider)
 
-	core:registerStepper(recs.event(player1.onInput.Event, { movement }))
-	core:registerStepper(recs.event(player1.onUpdate.Event, { collider }))
+	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider }))
+	--core:registerStepper(recs.event(player1.onUpdate.Event, { collider }))
 
 
 	render:init()
@@ -84,8 +84,8 @@ do -- server
 	core:registerSystem(movement)
 	core:registerSystem(collider)
 
-	core:registerStepper(recs.event(server.onInput.Event, { movement }))
-	core:registerStepper(recs.event(server.onUpdate.Event, { collider, render }))
+	core:registerStepper(recs.event(server.onInput.Event, { movement, collider }))
+	core:registerStepper(recs.event(server.onUpdate.Event, { render }))
 
 	core:start()
 end

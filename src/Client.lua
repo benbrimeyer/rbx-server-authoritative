@@ -62,8 +62,8 @@ function Client:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput [state]
 		bind(entity, input)
-		self.onInput:Fire(1/self.update_rate, input)
 	end
+	self.onInput:Fire(input)
 end
 
 function Client:setUpdateRate(hz)

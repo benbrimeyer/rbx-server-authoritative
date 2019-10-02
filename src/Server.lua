@@ -27,7 +27,7 @@ function Server.new(options)
 		onUpdate = Instance.new("BindableEvent"),
 	}, Server)
 
-	self:setUpdateRate(1);
+	self:setUpdateRate(10);
 
 	return self
 end
@@ -37,8 +37,8 @@ function Server:applyInputToEntity(input, entity)
 	for _, state in ipairs(input.state) do
 		local bind = entityInput[state]
 		bind(entity, input)
-		self.onInput:Fire(1/self.update_rate, input)
 	end
+	self.onInput:Fire(input)
 end
 
 function Server:connect(clientId)
