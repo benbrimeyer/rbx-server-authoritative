@@ -32,6 +32,11 @@
           "$path": "rodash/src"
         },
 
+        "debug": {
+          "$path": "debug"
+        },
+
+
         "import": {
           "$path": "import/src"
         },

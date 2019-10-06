@@ -5,6 +5,9 @@ return recs.defineComponent({
 	generator = function()
 		return {
 			velocity = Vector3.new(0, 0, 0),
+			acceleration = Vector3.new(),
+			impulse = Vector3.new(),
+			force = Vector3.new(),
 		}
 	end,
 })

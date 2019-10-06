@@ -8,6 +8,7 @@ local recsBridge = require(game.ReplicatedStorage.Packages.recsBridge)
 local renderSystem = require(script.Recs.Systems.render)
 local movementSystem = require(script.Recs.Systems.movement)
 local colliderSystem = require(script.Recs.Systems.collider)
+local physicsSystem = require(script.Recs.Systems.physics)
 
 do -- player1
 	local core = recs.Core.new()
@@ -19,11 +20,13 @@ do -- player1
 	local render = renderSystem(core, game:FindFirstChild("player1", true), true)
 	local movement = movementSystem(core, 'player1')
 	local collider = colliderSystem(core, 'player1')
+	local physics = physicsSystem(core, 'player')
 	core:registerSystem(render)
 	core:registerSystem(movement)
 	core:registerSystem(collider)
+	core:registerSystem(physics)
 
-	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider }))
+	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider, physics }))
 	--core:registerStepper(recs.event(player1.onUpdate.Event, { collider }))
 
 
@@ -42,6 +45,8 @@ do -- player1
 		else
 			player1:input("look", false)
 		end
+
+		player1:input("look", true)
 
 		render:step(dt)
 	end)
@@ -80,11 +85,13 @@ do -- server
 	local render = renderSystem(core, game:FindFirstChild("server", true), false, 'server')
 	local movement = movementSystem(core, 'server')
 	local collider = colliderSystem(core, 'server')
+	local physics = physicsSystem(core, 'server')
 	core:registerSystem(render)
 	core:registerSystem(movement)
 	core:registerSystem(collider)
+	core:registerSystem(physics)
 
-	core:registerStepper(recs.event(server.onInput.Event, { movement, collider }))
+	core:registerStepper(recs.event(server.onInput.Event, { movement, collider, physics }))
 	core:registerStepper(recs.event(server.onUpdate.Event, { render }))
 
 	core:start()

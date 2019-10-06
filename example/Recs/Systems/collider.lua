@@ -8,10 +8,10 @@ return function(core, logger)
 	local collider = recs.System:extend("collider")
 
 	function collider:step(input)
-		for entityId, walk, transform, motion in core:components("walk", "transform", "motion") do
+		for entityId, walk, motion in core:components("walk", "motion") do
 			local clamp = clampMagnitude(walk.direction, walk.speed * input.press_time)
 
-			transform.position = transform.position + clamp
+			motion.impulse = clamp
 			walk.direction = Vector3.new()
 		end
 	end
