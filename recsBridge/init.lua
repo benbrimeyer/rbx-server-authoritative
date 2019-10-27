@@ -40,6 +40,14 @@ return function(core)
 				walk.moveY = walk.moveY + (input.press_time)
 			end,
 
+			jump = function(entityId, input)
+				local walk = core:getComponent(entityId, "walk")
+				if walk.canJump then
+					walk.jump = true
+					walk.airTime = -0.25
+				end
+			end,
+
 			look = function(entityId, input)
 				local transform = core:getComponent(entityId, "transform")
 				if not transform then

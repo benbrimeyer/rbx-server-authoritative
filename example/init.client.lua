@@ -14,7 +14,7 @@ do -- player1
 	local core = recs.Core.new()
 	core:registerComponentsInInstance(script.Recs.Components)
 
-	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 100/1000 }))
+	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 0 }))
 	local player1 = engine.client()
 
 	local render = renderSystem(core, game:FindFirstChild("player1", true), true)
@@ -26,7 +26,7 @@ do -- player1
 	core:registerSystem(collider)
 	core:registerSystem(physics)
 
-	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider, physics }))
+	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider }))
 	--core:registerStepper(recs.event(player1.onUpdate.Event, { collider }))
 
 
@@ -66,6 +66,8 @@ do -- player1
 			player1:input("move_up", isKeyDown)
 		elseif inputObject.KeyCode == Enum.KeyCode.S then
 			player1:input("move_down", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.Space then
+			player1:input("jump", isKeyDown)
 		else
 			return Enum.ContextActionResult.Pass
 		end
@@ -91,7 +93,7 @@ do -- server
 	core:registerSystem(collider)
 	core:registerSystem(physics)
 
-	core:registerStepper(recs.event(server.onInput.Event, { movement, collider, physics }))
+	core:registerStepper(recs.event(server.onInput.Event, { movement, collider }))
 	core:registerStepper(recs.event(server.onUpdate.Event, { render }))
 
 	core:start()
