@@ -1,6 +1,6 @@
 local WALK_HEIGHT = 2.0
 local GRAVITY = 9.81 * 20
-local WALL_PADDING = 1.25
+local WALL_PADDING = 2.25
 
 local recs = require(game.ReplicatedStorage.Packages.recs)
 
@@ -74,12 +74,28 @@ return function(core, logger)
 
 
 			-- wall detection and defelection and what not
-			local castDirection = normalize(horizontalVelocity, moveVector)
-			local hitWall, wallPos, wallNormal = getWall(movePosition, castDirection)
+			do
+				if verticalVelocity.Y > 0 then
+					local castDirection = normalize(verticalVelocity, walk.velocity)
+					local hitWall, wallPos, wallNormal = getWall(movePosition, castDirection)
 
-			if hitWall and (movePosition - wallPos).magnitude < WALL_PADDING then
-				self.velocity = self.velocity + (wallNormal * wallNormal:Dot(-self.velocity))
+					if hitWall and (movePosition - wallPos).magnitude < 0.5 then
+						walk.airTime = 0
+						walk.velocity = walk.velocity + (wallNormal * wallNormal:Dot(-walk.velocity))
+					end
+				end
 			end
+
+			do
+				local castDirection = normalize(horizontalVelocity, walk.velocity)
+				local hitWall, wallPos, wallNormal = getWall(movePosition, castDirection)
+
+				if hitWall and (movePosition - wallPos).magnitude < WALL_PADDING then
+					walk.velocity = walk.velocity + (wallNormal * wallNormal:Dot(-walk.velocity))
+				end
+			end
+
+
 
 			-- position stuff (raycast his change in the future?)
 			transform.position = movePosition + (walk.velocity * dt)
