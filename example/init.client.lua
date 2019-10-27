@@ -99,5 +99,9 @@ do -- server
 	core:start()
 end
 
-
+spawn(function()
+	wait(2)
+	workspace.CurrentCamera.CameraSubject = workspace:FindFirstChild("render"):FindFirstChild("player1"):FindFirstChild("Part1")
+	workspace.CurrentCamera.CameraType = "Custom"
+end)
 print("Done")

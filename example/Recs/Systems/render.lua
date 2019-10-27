@@ -16,7 +16,7 @@ return function(core, canvas, isLerped, logger)
 				* CFrame.Angles(math.rad(transform.pitch or 0), 0, 0)
 
 			if isLerped then
-				player.CFrame = player.CFrame:Lerp(goal, 0.1)
+				player.CFrame = player.CFrame:Lerp(goal, 0.4)
 			else
 				player.CFrame = goal
 			end

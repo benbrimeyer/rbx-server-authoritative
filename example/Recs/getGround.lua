@@ -53,8 +53,6 @@ local function castRay(origin, direction, recursive)
 	local ray = recursive or Ray.new(origin, direction)
 	local hit, pos, norm = CAST_RAY(workspace, ray, IGNORE_LIST)
 
-	debug.drawRay(ray)
-	--print("origin", origin)
 	if hit and not hit.CanCollide then
 		table.insert(IGNORE_LIST, hit)
 		return castRay(origin, direction, ray)
@@ -99,4 +97,59 @@ local function getGround(position, direction)
 	return ground, finalPosition, normalize(normal), velocity, friction
 end
 
-return getGround
+-- object space directions to cast to walls (magnitude matters)
+local WALL_CAST_VECTORS = {
+	Vector3.new(math.cos(0.95/5 * math.pi), 0, -math.sin(0.95/5 * math.pi)) * 3,
+	Vector3.new(math.cos(1.05/5 * math.pi), 0, -math.sin(1.05/5 * math.pi)) * 3,
+
+	Vector3.new(math.cos(1.95/5 * math.pi), 0, -math.sin(1.95/5 * math.pi)) * 3,
+	Vector3.new(math.cos(2.05/5 * math.pi), 0, -math.sin(2.05/5 * math.pi)) * 3,
+
+	Vector3.new(math.cos(2.95/5 * math.pi), 0, -math.sin(2.95/5 * math.pi)) * 3,
+	Vector3.new(math.cos(3.05/5 * math.pi), 0, -math.sin(3.05/5 * math.pi)) * 3,
+
+	Vector3.new(math.cos(3.95/5 * math.pi), 0, -math.sin(3.95/5 * math.pi)) * 3,
+	Vector3.new(math.cos(4.05/5 * math.pi), 0, -math.sin(4.05/5 * math.pi)) * 3,
+}
+local function getWall(position, direction)
+	local impactList = {}
+	local wall;
+
+	local normal = Vector3.new()
+	local finalPosition = Vector3.new()
+	local positionIndex = 0
+
+	local originCF = CFrame.new(position - (direction * 0.5), position + direction)
+
+	for _, vector in next, WALL_CAST_VECTORS do
+		local castTo = originCF:pointToWorldSpace(vector)
+		local hit, pos, norm = castRay(originCF.p, castTo - originCF.p)
+
+		if hit then
+			impactList[hit] = (impactList[hit] or 0) + 1
+			finalPosition = finalPosition + pos
+			positionIndex = positionIndex + 1
+		end
+
+		normal = normal + (norm * (norm:Dot(-direction)))
+	end
+
+	for part, count in next, impactList do
+		if count == #WALL_CAST_VECTORS then
+			wall = part
+			break
+		elseif impactList[wall or part] >= count then
+			wall = part
+		end
+	end
+
+	wall = findMostOccurring(impactList, #WALL_CAST_VECTORS)
+	finalPosition = finalPosition/positionIndex
+
+	return wall, finalPosition, normalize(normal)
+end
+
+return {
+	getGround = getGround,
+	getWall = getWall,
+}

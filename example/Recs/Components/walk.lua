@@ -8,7 +8,7 @@ return recs.defineComponent({
 			jump = false,
 			airTime = 0.25,
 			canJump = false,
-			--velocity = Vector3.new(),
+			velocity = Vector3.new(),
 			direction = Vector3.new(),
 			moveX = 0,
 			moveY = 0,

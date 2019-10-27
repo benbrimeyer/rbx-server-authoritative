@@ -1,5 +1,6 @@
 local WALK_HEIGHT = 2.0
 local GRAVITY = 9.81 * 20
+local WALL_PADDING = 1.25
 
 local recs = require(game.ReplicatedStorage.Packages.recs)
 
@@ -19,7 +20,8 @@ local function normalize(vec)
 	end
 end
 
-local getGround = require(script.Parent.Parent.getGround)
+local getGround = require(script.Parent.Parent.getGround).getGround
+local getWall = require(script.Parent.Parent.getGround).getWall
 
 return function(core, logger)
 	local collider = recs.System:extend("collider")
@@ -61,25 +63,26 @@ return function(core, logger)
 
 			walk.canJump = walk.airTime == 0 --hitGround ~= nil
 
+
 			-- ground friction & velocity combining
 			--local lastFlat = walk.velocity * Vector3.new(1, 0, 1)
 			--walk.velocity = lastFlat:Lerp(horizontalVelocity, groundFriction) + verticalVelocity
 
-			local lastFlat = self.velocity * Vector3.new(1, 0, 1)
-			self.velocity = lastFlat:Lerp(horizontalVelocity, groundFriction) + verticalVelocity
+			local lastFlat = walk.velocity * Vector3.new(1, 0, 1)
+			walk.velocity = lastFlat:Lerp(horizontalVelocity, groundFriction) + verticalVelocity
 			--self.velocity = horizontalVelocity + verticalVelocity
 
 
-			--[[-- wall detection and defelection and what not
-			local castDirection = normalize(horizontalVelocity, moveDirection)
+			-- wall detection and defelection and what not
+			local castDirection = normalize(horizontalVelocity, moveVector)
 			local hitWall, wallPos, wallNormal = getWall(movePosition, castDirection)
 
 			if hitWall and (movePosition - wallPos).magnitude < WALL_PADDING then
-				moveVelocity = moveVelocity + (wallNormal * wallNormal:Dot(-moveVelocity))
-			end]]
+				self.velocity = self.velocity + (wallNormal * wallNormal:Dot(-self.velocity))
+			end
 
 			-- position stuff (raycast his change in the future?)
-			transform.position = movePosition + (self.velocity * dt)
+			transform.position = movePosition + (walk.velocity * dt)
 			walk.jump = false
 			walk.direction = Vector3.new()
 		end
