@@ -56,7 +56,15 @@ return function(core)
 
 				transform.pitch = input.look.pitch
 				transform.yaw = input.look.yaw
-			end
+			end,
+
+			dash = function(entityId, input)
+				local transform = core:getComponent(entityId, "transform")
+				local motion = core:getComponent(entityId, "motion")
+
+				motion.force = (CFrame.new(transform.position)
+					* CFrame.Angles(0, math.rad(transform.yaw or 0), 0)).lookVector * 1000
+			end,
 		},
 	}
 end

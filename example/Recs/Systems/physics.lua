@@ -19,27 +19,24 @@ local cast = function(position, direction, bias)
 	return not not hit, normal * (hip - distanceFromGround)
 end
 
-return function(core)
+return function(core, logger)
 	local physics = recs.System:extend("physics")
 
 	function physics:step(input)
 		local dt = input.press_time
 
 		for entityId, transform, motion in core:components("transform", "motion") do
-
-			motion.acceleration = Vector3.new(0, -100, 0) + motion.force
-			motion.velocity = (motion.velocity + motion.acceleration * dt) * (1 - 0.5 * dt)
-			local isGround, normal = cast(transform.position, motion.acceleration, motion.impulse)
-			if isGround then
-				motion.acceleration = Vector3.new()
-				motion.velocity = Vector3.new()
-				motion.impulse = motion.impulse + (normal)
+			local friction = Vector3.new()
+			if motion.velocity2.magnitude > 0.02 then
+				friction = -motion.velocity2 * 0.3
 			end
+			motion.acceleration = motion.force
 
-			transform.position = transform.position + (motion.velocity * dt + motion.acceleration * (dt * dt * 0.5)) + motion.impulse
+			motion.velocity2 = ((motion.velocity2 + motion.acceleration * dt) * (1 - 0.98 * dt)) + friction
+			transform.position = transform.position + (motion.velocity2 * dt + motion.acceleration * (dt * dt * 0.5)) + motion.impulse
+
 			motion.impulse = Vector3.new()
 			motion.force = Vector3.new()
-
 		end
 	end
 

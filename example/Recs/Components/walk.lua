@@ -4,7 +4,7 @@ return recs.defineComponent({
 	name = "walk",
 	generator = function()
 		return {
-			speed = 16,
+			speed = 26,
 			jump = false,
 			airTime = 0.25,
 			canJump = false,

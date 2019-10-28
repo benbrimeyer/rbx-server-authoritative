@@ -26,18 +26,13 @@ local getWall = require(script.Parent.Parent.getGround).getWall
 return function(core, logger)
 	local collider = recs.System:extend("collider")
 
-	function collider:init()
-		self.velocity = Vector3.new()
-	end
-
 	function collider:step(input)
-		for entityId, walk, transform, motion in core:components("walk", "transform", "motion") do
+		for entityId, walk, transform in core:components("walk", "transform") do
 			local dt = input.press_time
 			local moveVector = walk.direction.magnitude > 0 and walk.direction.unit or Vector3.new() --self.velocity.magnitude > 0 and self.velocity.unit or Vector3.new()--clampMagnitude(walk.direction, walk.speed * input.press_time)
 			local movePosition = transform.position
 			local jumpRequest = walk.jump
 			local airTime = walk.airTime
-
 
 			-- collision casting and what not
 			local hitGround, groundPos, groundNormal, groundVelocity, groundFriction = getGround(movePosition, moveVector)

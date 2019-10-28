@@ -9,12 +9,12 @@ local renderSystem = require(script.Recs.Systems.render)
 local movementSystem = require(script.Recs.Systems.movement)
 local colliderSystem = require(script.Recs.Systems.collider)
 local physicsSystem = require(script.Recs.Systems.physics)
-
+wait(1)
 do -- player1
 	local core = recs.Core.new()
 	core:registerComponentsInInstance(script.Recs.Components)
 
-	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 0 }))
+	local engine = require(game.ReplicatedStorage.Packages.engine).config(rodash.merge(recsBridge(core), { address = 1, lag = 150/1000 }))
 	local player1 = engine.client()
 
 	local render = renderSystem(core, game:FindFirstChild("player1", true), true)
@@ -26,7 +26,7 @@ do -- player1
 	core:registerSystem(collider)
 	core:registerSystem(physics)
 
-	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider }))
+	core:registerStepper(recs.event(player1.onInput.Event, { movement, collider, physics }))
 	--core:registerStepper(recs.event(player1.onUpdate.Event, { collider }))
 
 
@@ -68,6 +68,8 @@ do -- player1
 			player1:input("move_down", isKeyDown)
 		elseif inputObject.KeyCode == Enum.KeyCode.Space then
 			player1:input("jump", isKeyDown)
+		elseif inputObject.KeyCode == Enum.KeyCode.E then
+			player1:input("dash", isKeyDown)
 		else
 			return Enum.ContextActionResult.Pass
 		end
@@ -93,14 +95,14 @@ do -- server
 	core:registerSystem(collider)
 	core:registerSystem(physics)
 
-	core:registerStepper(recs.event(server.onInput.Event, { movement, collider }))
+	core:registerStepper(recs.event(server.onInput.Event, { movement, collider, physics }))
 	core:registerStepper(recs.event(server.onUpdate.Event, { render }))
 
 	core:start()
 end
 
 spawn(function()
-	wait(2)
+	wait()
 	workspace.CurrentCamera.CameraSubject = workspace:FindFirstChild("render"):FindFirstChild("player1"):FindFirstChild("Part1")
 	workspace.CurrentCamera.CameraType = "Custom"
 end)
