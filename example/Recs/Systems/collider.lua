@@ -53,7 +53,9 @@ return function(core, logger)
 				walk.airTime = 0
 			else
 				verticalVelocity = verticalVelocity - Vector3.new(0, GRAVITY * airTime, 0)
-				walk.airTime = airTime + dt
+				if hitGround == nil then
+					walk.airTime = airTime + dt
+				end
 			end
 
 			-- jump stuff
@@ -94,8 +96,6 @@ return function(core, logger)
 					walk.velocity = walk.velocity + (wallNormal * wallNormal:Dot(-walk.velocity))
 				end
 			end
-
-
 
 			-- position stuff (raycast his change in the future?)
 			transform.position = movePosition + (walk.velocity * dt)
